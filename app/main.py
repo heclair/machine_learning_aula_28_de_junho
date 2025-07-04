@@ -13,18 +13,28 @@ app = FastAPI(title="API de Detecção de Fake News", version="1.0")
 class TextoEntrada(BaseModel):
     texto: str
 
-# Rota principal de classificação
 @app.post("/api/classificar-noticia")
 def classificar_noticia(entrada: TextoEntrada):
+    print(f"📩 Texto recebido: {entrada.texto!r}")
+
     if not entrada.texto.strip():
+        print("❌ Texto vazio recebido. Requisição rejeitada.")
         raise HTTPException(status_code=400, detail="Texto não pode ser vazio.")
+
     resultado, confianca = classificar_texto(entrada.texto)
+
+    print(f"✅ Classificação: {resultado}, Confiança: {confianca:.2f}%")
+
     Historico.adicionar(entrada.texto, resultado, confianca)
-    return {
+
+    resposta = {
         "classificacao": resultado,
         "confianca": confianca,
         "data": datetime.now().isoformat()
     }
+
+    print(f"📤 Resposta enviada: {resposta}")
+    return resposta
 
 # Rota para consultar o histórico
 @app.get("/api/historico")
