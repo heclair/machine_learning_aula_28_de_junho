@@ -28,6 +28,7 @@ if st.button("Analisar"):
                     classificacao = data.get("classificacao", "Erro")
                     confianca = data.get("confianca", 0)
                     data_analisada = data.get("data")
+                    explicacao = data.get("explicacao", [])
 
                     if classificacao in ["Real", "True"]:
                         st.markdown(f"""
@@ -48,6 +49,13 @@ if st.button("Analisar"):
                         """, unsafe_allow_html=True)
                     else:
                         st.warning(f"⚠️ Resultado inesperado: {classificacao}")
+
+                    # Mostrar palavras influentes se houver
+                    if explicacao:
+                        st.markdown("### 🔍 Palavras influentes na decisão do modelo:")
+                        for palavra, peso in explicacao:
+                            st.markdown(f"- **{palavra}** → peso: `{peso:.3f}`")
+
                 else:
                     st.error(f"Erro {response.status_code}: {response.text}")
             except Exception as e:
