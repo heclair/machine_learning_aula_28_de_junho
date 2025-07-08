@@ -7,101 +7,130 @@ Este projeto utiliza **BERTimbau** e **Logistic Regression** para classificar te
 ## 🚀 Funcionalidades
 
 - 🔎 Classificação de frases como **Fake** ou **True**
+- 📈 Retorno da **confiança (%)**
+- 💬 Explicação das palavras mais influentes (**LIME**)
 - 💬 Suporte a frases curtas e sensíveis (ex: "água faz mal à saúde")
 - 📚 Histórico de classificações realizadas
-- 📡 API REST com **FastAPI**
+- ⚙️ Backend com **FastAPI**
+- 🌐 Interface com **Streamlit**
+- 📦 Conteinerização com **Docker**
+- ☸️ Deploy com **Kubernetes (Minikube)**
 
 ---
 
 ## 📁 Estrutura de Pastas
 
-```
-app/
-├── main.py                  # API principal (FastAPI)
-├── data/                    # Vetores TF-IDF (ignorado no Git)
-├── data_bert/               # Embeddings BERT e modelos (ignorado no Git)
-├── Fake.br-Corpus/          # Dataset original e pré-processado
-├── services/                # Lógica da API: classificação, status, histórico
-├── treino/                  # Scripts de pré-processamento, treinamento e predição
-├── requirements.txt         # Dependências do projeto
-└── README.md                # Este arquivo
-```
+machine_learning_aula_28_de_junho/
+├── app/
+│ ├── main.py # API principal (FastAPI)
+│ ├── src/ # Lógica da API: classificação, status, histórico
+│ ├── data/ # Vetores TF-IDF (ignorado no Git)
+│ ├── data_bert/ # Embeddings BERT e modelos treinados
+│ ├── Fake.br-Corpus/ # Dataset original e pré-processado
+│ └── treino/ # Scripts de pré-processamento, treinamento e LIME
+├── frontend/ # Interface em Streamlit
+│ ├── app.py
+│ └── requirements.txt
+├── k8s/ # Manifests do Kubernetes
+│ ├── deployment.yaml
+│ └── service.yaml
+├── Dockerfile # Backend Dockerfile
+├── docker-compose.yml # Compose para backend + frontend
+└── README.md # Este arquivo
+
 
 ---
 
-## ⚙️ Como rodar o projeto
+## ⚙️ Como rodar o projeto localmente com Docker Compose
 
-### 1. Clone o repositório e crie o ambiente virtual
+### 1. Pré-requisitos
 
-```bash
-python -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate no Windows
-```
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-### 2. Instale as dependências
+### 2. Rodar aplicação
 
 ```bash
-pip install -r requirements.txt
-```
+docker-compose up --build
 
-### 3. Execute a API com Uvicorn
+3. Acessar os serviços
+🧠 Backend: http://localhost:8000/docs
 
-```bash
-uvicorn app.main:app --reload
-```
+🌐 Frontend: http://localhost:8501
 
-### 4. Acesse a interface de testes (Swagger UI)
 
-👉 [http://localhost:8000/docs](http://localhost:8000/docs)
+📡 Endpoints
+POST /api/classificar-noticia
+Classifica um texto como Fake ou True.
 
----
-
-## 📡 Endpoints
-
-### `POST /api/classificar-noticia`
-Classifica um texto como **Fake** ou **True**.
-
-**Body JSON:**
-```json
 {
   "texto": "água faz mal à saúde"
 }
-```
 
-**Resposta:**
-```json
+
 {
   "classificacao": "Fake",
   "confianca": 97.32,
-  "data": "2025-06-28T12:00:00"
+  "data": "2025-06-28T12:00:00",
+  "explicacao": [["água", 0.42], ["saúde", -0.21]]
 }
-```
 
----
-
-### `GET /api/historico`
+GET /api/historico
 Retorna o histórico de classificações realizadas.
 
-### `GET /api/status`
+GET /api/status
 Retorna status atual do modelo carregado (tipo, embeddings, versão).
 
----
+🌐 Interface Web (Streamlit)
+Permite ao usuário digitar título e texto da notícia para:
 
-## 🧠 Modelo
+✅ Exibir se é Fake ou True
 
-- **Embeddings:** `BERTimbau` (`neuralmind/bert-base-portuguese-cased`)
-- **Classificador:** `LogisticRegression`
-- **Treinamento:** `bert_train.py`
-- **Dados:** Corpus Fake.Br + frases sociais e éticas criadas para melhorar a generalização
+📊 Mostrar confiança (%)
 
----
+💬 Exibir explicações LIME (palavras influentes)
 
-## 📄 Licença
+🕓 Mostrar data da análise
 
+📦 Como fazer o deploy com Kubernetes
+
+docker build -t seuusuario/fake-news-backend:latest .
+docker push seuusuario/fake-news-backend:latest
+
+docker build -t seuusuario/fake-news-frontend:latest ./frontend
+docker push seuusuario/fake-news-frontend:latest
+
+2. Instalar o Minikube (Windows via PowerShell)
+
+choco install minikube -y
+
+3. Iniciar o cluster
+
+minikube start
+
+4. Criar recursos no Kubernetes
+
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+5. Acessar via Minikube
+
+minikube service fake-news-service
+
+
+🧠 Modelo
+Embeddings: BERTimbau (neuralmind/bert-base-portuguese-cased)
+
+Classificador: LogisticRegression
+
+Explicabilidade: LIME (Local Interpretable Model-agnostic Explanations)
+
+Treinamento: bert_train.py
+
+Dados: Corpus Fake.Br + frases sociais e éticas criadas para melhorar a generalização
+
+📄 Licença
 Este projeto é de uso educacional e acadêmico. Para uso em produção, é importante aplicar filtros adicionais, controle de viés e validação contínua.
 
----
-
-## 🙋‍♂️ Contato
-
+🙋‍♂️ Contato
 Dúvidas ou sugestões? Contribuições são bem-vindas!

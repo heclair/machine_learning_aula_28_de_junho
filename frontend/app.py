@@ -20,9 +20,10 @@ if st.button("Analisar"):
         with st.spinner("Analisando com IA..."):
             try:
                 response = requests.post(
-                    "http://127.0.0.1:8000/api/classificar-noticia",
+                    "http://backend:8000/api/classificar-noticia",
                     json={"texto": texto_completo}
                 )
+
                 if response.status_code == 200:
                     data = response.json()
                     classificacao = data.get("classificacao", "Erro")

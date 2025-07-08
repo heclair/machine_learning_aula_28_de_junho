@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fake-news-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fake-news
+  template:
+    metadata:
+      labels:
+        app: fake-news
+    spec:
+      containers:
+      - name: backend
+        image: heclair/fake-news-backend:latest
+        ports:
+        - containerPort: 8000
+      - name: frontend
+        image: heclair/fake-news-frontend:latest
+        ports:
+        - containerPort: 8501
